@@ -1,7 +1,7 @@
 name = "Raycast"
 uuid = "c61cbefd-5868-4483-9364-69221f875375"
 authors = ["devansh <devansh@umich.edu> and contributors"]
-version = "1.0.0-DEV"
+version = "v0.0.2"
 
 [compat]
 julia = "1"
