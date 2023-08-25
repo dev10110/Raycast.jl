@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · Raycast.jl</title><script data-outdated-warner src="assets/warner.js"></script><link rel="canonical" href="https://dev10110.github.io/Raycast.jl/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>Raycast.jl</a></span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Usage"><span>Usage</span></a></li><li><a class="tocitem" href="#WARNING"><span>WARNING</span></a></li><li><a class="tocitem" href="#Credits"><span>Credits</span></a></li><li><a class="tocitem" href="#Index"><span>Index</span></a></li><li><a class="tocitem" href="#API"><span>API</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/dev10110/Raycast.jl/blob/main/docs/src/index.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Raycast"><a class="docs-heading-anchor" href="#Raycast">Raycast</a><a id="Raycast-1"></a><a class="docs-heading-anchor-permalink" href="#Raycast" title="Permalink"></a></h1><p>Documentation for <a href="https://github.com/dev10110/Raycast.jl">Raycast</a>.</p><p>Provides a simple and fast method to run the Bresenham algorithm for raycasting in 3D. </p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><pre><code class="language-julia hljs">using Raycast
+
+p0 = (0,0,0)      # any tuple of integers will work
+p1 = (10, 5, -3)  # any tuple of integers will work
+
+prob = BresenhamProblem(p0, p1)
+for p in prob
+  @show p
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p = (0, 0, 0)
+p = (1, 1, 0)
+p = (2, 1, -1)
+p = (3, 2, -1)
+p = (4, 2, -1)
+p = (5, 3, -2)
+p = (6, 3, -2)
+p = (7, 4, -2)
+p = (8, 4, -2)
+p = (9, 5, -3)
+p = (10, 5, -3)</code></pre><p>When you construct <code>BresenhamProblem</code> it returns an iterator, so you can do things like</p><pre><code class="language-julia hljs">collect(prob)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">11-element Vector{Tuple{Int64, Int64, Int64}}:
+ (0, 0, 0)
+ (1, 1, 0)
+ (2, 1, -1)
+ (3, 2, -1)
+ (4, 2, -1)
+ (5, 3, -2)
+ (6, 3, -2)
+ (7, 4, -2)
+ (8, 4, -2)
+ (9, 5, -3)
+ (10, 5, -3)</code></pre><p>or </p><pre><code class="language-julia hljs">length(prob)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">11</code></pre><p>The benefit of using the iterator interface is that it is non-allocating, and can support early termination. For instance, </p><pre><code class="language-julia hljs">using LinearAlgebra
+p0 = (0,0,0)
+p1 = (100000000, 5, -3)
+
+prob = BresenhamProblem(p0, p1)
+begin
+  for p in prob
+     @show p
+     if (norm(p) &gt; 10)
+       println(&quot;far!&quot;)
+       break
+     end
+  end
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p = (0, 0, 0)
+p = (1, 0, 0)
+p = (2, 0, 0)
+p = (3, 0, 0)
+p = (4, 0, 0)
+p = (5, 0, 0)
+p = (6, 0, 0)
+p = (7, 0, 0)
+p = (8, 0, 0)
+p = (9, 0, 0)
+p = (10, 0, 0)
+p = (11, 0, 0)
+far!</code></pre><p>Alternatively, if you don&#39;t like the iterator interface, you can directly call</p><pre><code class="language-julia hljs">p1 = (10, 5, -3)  # any tuple of integers will work
+bresenham(p0, p1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">11-element Vector{Tuple{Int64, Int64, Int64}}:
+ (0, 0, 0)
+ (1, 1, 0)
+ (2, 1, -1)
+ (3, 2, -1)
+ (4, 2, -1)
+ (5, 3, -2)
+ (6, 3, -2)
+ (7, 4, -2)
+ (8, 4, -2)
+ (9, 5, -3)
+ (10, 5, -3)</code></pre><p>to get the entire vector. Note, this is slower than <code>collect(prob)</code> (and gives the same result) so there is really no reason to use this. </p><h2 id="WARNING"><a class="docs-heading-anchor" href="#WARNING">WARNING</a><a id="WARNING-1"></a><a class="docs-heading-anchor-permalink" href="#WARNING" title="Permalink"></a></h2><p>The code is type-stable. Since sometimes we double some quantities, this can cause a integer overflow. </p><p>Therefore, it is safest to ensure your input is of type <code>Int64</code>. There is no meaningful loss of speed if you do this.  An error will be thrown if it is likely for your types to overflow</p><h2 id="Credits"><a class="docs-heading-anchor" href="#Credits">Credits</a><a id="Credits-1"></a><a class="docs-heading-anchor-permalink" href="#Credits" title="Permalink"></a></h2><p>The code (and logic) is taken from <a href="https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/">https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/</a></p><h2 id="Index"><a class="docs-heading-anchor" href="#Index">Index</a><a id="Index-1"></a><a class="docs-heading-anchor-permalink" href="#Index" title="Permalink"></a></h2><ul><li><a href="#Raycast.BresenhamProblem"><code>Raycast.BresenhamProblem</code></a></li><li><a href="#Raycast.Point2"><code>Raycast.Point2</code></a></li><li><a href="#Raycast.Point3"><code>Raycast.Point3</code></a></li><li><a href="#Raycast.bresenham-Union{Tuple{T}, Tuple{Tuple{T, T}, Tuple{T, T}}} where T&lt;:Integer"><code>Raycast.bresenham</code></a></li><li><a href="#Raycast.bresenham-Union{Tuple{T}, Tuple{Tuple{T, T, T}, Tuple{T, T, T}}} where T&lt;:Integer"><code>Raycast.bresenham</code></a></li></ul><h2 id="API"><a class="docs-heading-anchor" href="#API">API</a><a id="API-1"></a><a class="docs-heading-anchor-permalink" href="#API" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="Raycast.BresenhamProblem" href="#Raycast.BresenhamProblem"><code>Raycast.BresenhamProblem</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">BresenhamProblem(start_point::Point3, end_point::Point3)</code></pre><p>returns an iterator that will cast a ray from start<em>point to end</em>point.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; p0 = (0,0,0)
+julia&gt; p1 = (10,0,0)
+
+julia&gt; for p in BresenhamProblem(p0, p1)
+         @show p
+       end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/dev10110/Raycast.jl/blob/dfd4df529de211394f38403b573cef7f85c1764a/src/bresenham_iterator.jl#L2-L18">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Raycast.Point2" href="#Raycast.Point2"><code>Raycast.Point2</code></a> — <span class="docstring-category">Type</span></header><section><div><p><code>Point2{T}</code> is an alias for <code>Tuple{T,T}</code></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/dev10110/Raycast.jl/blob/dfd4df529de211394f38403b573cef7f85c1764a/src/Raycast.jl#L9">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Raycast.Point3" href="#Raycast.Point3"><code>Raycast.Point3</code></a> — <span class="docstring-category">Type</span></header><section><div><p><code>Point3{T}</code> is an alias for <code>Tuple{T,T,T}</code></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/dev10110/Raycast.jl/blob/dfd4df529de211394f38403b573cef7f85c1764a/src/Raycast.jl#L11">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Raycast.bresenham-Union{Tuple{T}, Tuple{Tuple{T, T, T}, Tuple{T, T, T}}} where T&lt;:Integer" href="#Raycast.bresenham-Union{Tuple{T}, Tuple{Tuple{T, T, T}, Tuple{T, T, T}}} where T&lt;:Integer"><code>Raycast.bresenham</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">bresenham(start_point::Point3, end_point::Point3)</code></pre><p>returns a Vector{Point3} of the pixels touched by the ray connecting start point to end point</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/dev10110/Raycast.jl/blob/dfd4df529de211394f38403b573cef7f85c1764a/src/bresenham.jl#L47-L51">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Raycast.bresenham-Union{Tuple{T}, Tuple{Tuple{T, T}, Tuple{T, T}}} where T&lt;:Integer" href="#Raycast.bresenham-Union{Tuple{T}, Tuple{Tuple{T, T}, Tuple{T, T}}} where T&lt;:Integer"><code>Raycast.bresenham</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">bresenham(start_point::Point2, end_point::Point2)</code></pre><p>returns a Vector{Point2} of the pixels touched by the ray connecting start point to end point</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/dev10110/Raycast.jl/blob/dfd4df529de211394f38403b573cef7f85c1764a/src/bresenham.jl#L4-L8">source</a></section></article></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 25 August 2023 03:56">Friday 25 August 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
