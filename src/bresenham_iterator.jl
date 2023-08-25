@@ -21,7 +21,7 @@ struct BresenhamProblem{T}
     end_point::Point3{T}
 end
 
-struct BresenhamState{T <: Integer}
+struct BresenhamState{T<:Integer}
     point::Point3{T}
     dir::T # x=1, y=2, z=3
     d::Point3{T} # dx, dy, dz
@@ -39,7 +39,7 @@ function Base.length(prob::BresenhamProblem{T}) where {T}
     dy = abs(y2 - y1)
     dz = abs(z2 - z1)
 
-    return Int(maximum((dx,dy,dz))) + 1
+    return Int(maximum((dx, dy, dz))) + 1
 end
 
 
@@ -66,8 +66,12 @@ function Base.iterate(prob::BresenhamProblem{T}) where {T}
     y2 = prob.end_point[2]
     z2 = prob.end_point[3]
 
-    if (maximum( abs.((x1, y1, z1, x2, y2, z2)) ) > typemax(T) / 2)
-        throw(DomainError("type $(T) is likely too small for this problem. Consider casting your input to Int64"))
+    if (maximum(abs.((x1, y1, z1, x2, y2, z2))) > typemax(T) / 2)
+        throw(
+            DomainError(
+                "type $(T) is likely too small for this problem. Consider casting your input to Int64",
+            ),
+        )
     end
 
     dx = abs(x2 - x1)
@@ -83,25 +87,19 @@ function Base.iterate(prob::BresenhamProblem{T}) where {T}
         dir = T(1)
         p1 = T(2) * dy - dx
         p2 = T(2) * dz - dx
-    # Driving axis is Y-axis
+        # Driving axis is Y-axis
     elseif (dy >= dx && dy >= dz)
         dir = T(2)
         p1 = T(2) * dx - dy
         p2 = T(2) * dz - dy
-    # Driving axis is Z-axis
+        # Driving axis is Z-axis
     else
         dir = T(3)
         p1 = T(2) * dy - dz
         p2 = T(2) * dx - dz
     end
 
-    state = BresenhamState(
-        prob.start_point,
-        dir,
-        (dx,dy,dz),
-        (xs,ys,zs),
-        p1,p2
-    )
+    state = BresenhamState(prob.start_point, dir, (dx, dy, dz), (xs, ys, zs), p1, p2)
 
     return prob.start_point, state
 end
@@ -127,7 +125,7 @@ function Base.iterate(prob::BresenhamProblem{T}, state::BresenhamState{T}) where
     p2 = state.p2
 
     # Driving axis is X-axis
-    if (state.dir == T(1) )
+    if (state.dir == T(1))
         if (p1 >= T(0))
             y1 += ys
             p1 -= T(2) * dx
@@ -139,8 +137,8 @@ function Base.iterate(prob::BresenhamProblem{T}, state::BresenhamState{T}) where
         x1 += xs
         p1 += T(2) * dy
         p2 += T(2) * dz
-    # Driving axis is Y-axis
-    elseif (state.dir == T(2) )
+        # Driving axis is Y-axis
+    elseif (state.dir == T(2))
         if (p1 >= T(0))
             x1 += xs
             p1 -= T(2) * dy
@@ -152,7 +150,7 @@ function Base.iterate(prob::BresenhamProblem{T}, state::BresenhamState{T}) where
         y1 += ys
         p1 += T(2) * dx
         p2 += T(2) * dz
-    # Driving axis is Z-axis
+        # Driving axis is Z-axis
     else
         if (p1 >= T(0))
             y1 += ys
@@ -167,15 +165,6 @@ function Base.iterate(prob::BresenhamProblem{T}, state::BresenhamState{T}) where
         p2 += T(2) * dx
     end
 
-    next_state = BresenhamState(
-        (x1,y1,z1),
-        state.dir,
-        state.d,
-        state.s,
-        p1,p2
-    )
-    return (x1,y1,z1), next_state
+    next_state = BresenhamState((x1, y1, z1), state.dir, state.d, state.s, p1, p2)
+    return (x1, y1, z1), next_state
 end
-
-
-

@@ -6,7 +6,7 @@
 
 returns a Vector{Point2} of the pixels touched by the ray connecting start point to end point
 """
-function bresenham(start_point::Point2{T}, end_point::Point2{T}) where {T <: Integer}
+function bresenham(start_point::Point2{T}, end_point::Point2{T}) where {T<:Integer}
 
     x0 = start_point[1]
     y0 = start_point[2]
@@ -26,7 +26,7 @@ function bresenham(start_point::Point2{T}, end_point::Point2{T}) where {T <: Int
 
     while (x0 != x1 || y0 != y1)
 
-        push!(inds, (x0, y0) )
+        push!(inds, (x0, y0))
 
         e2 = err
         if e2 > -dx
@@ -63,21 +63,25 @@ function bresenham(start_point::Point3{T}, end_point::Point3{T}) where {T<:Integ
     dy = abs(y2 - y1)
     dz = abs(z2 - z1)
 
-    
+
     xs = (x2 > x1) ? T(1) : T(-1)
     ys = (y2 > y1) ? T(1) : T(-1)
     zs = (z2 > z1) ? T(1) : T(-1)
 
     N = maximum((dx, dy, dz)) + T(1)
-    
-    if (maximum( abs.((x1, y1, z1, x2, y2, z2)) ) > typemax(T) / 2)
-        throw(DomainError("type $(T) is likely too small for this problem. Consider casting your input to Int64"))
+
+    if (maximum(abs.((x1, y1, z1, x2, y2, z2))) > typemax(T) / 2)
+        throw(
+            DomainError(
+                "type $(T) is likely too small for this problem. Consider casting your input to Int64",
+            ),
+        )
     end
 
     # allocate the output
     # ListOfPoints = Vector{Point3{T}}(undef, N)
     ListOfPoints = Point3{T}[]
-    push!(ListOfPoints, (x1, y1, z1) )
+    push!(ListOfPoints, (x1, y1, z1))
 
     # Driving axis is X-axis
     if (dx >= dy && dx >= dz)
@@ -98,7 +102,7 @@ function bresenham(start_point::Point3{T}, end_point::Point3{T}) where {T<:Integ
             push!(ListOfPoints, (x1, y1, z1))
         end
 
-    # Driving axis is Y-axis
+        # Driving axis is Y-axis
     elseif (dy >= dx && dy >= dz)
         p1 = T(2) * dx - dy
         p2 = T(2) * dz - dy
@@ -118,7 +122,7 @@ function bresenham(start_point::Point3{T}, end_point::Point3{T}) where {T<:Integ
         end
 
 
-    # Driving axis is Z-axis
+        # Driving axis is Z-axis
     else
         p1 = T(2) * dy - dz
         p2 = T(2) * dx - dz
