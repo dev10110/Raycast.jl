@@ -24,4 +24,4 @@ end
 ```
 
 ## Documentation
-See ![the docs](https://dev10110.github.io/Raycast.jl/dev/) for details.
+See [the docs](https://dev10110.github.io/Raycast.jl/dev/) for details.
